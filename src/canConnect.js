@@ -1,4 +1,13 @@
 export function canConnect(portA, portB) {
+
+  if (portA.connectedTo) {
+    return { isValid: false, reason: `${portA.label} port is already connected to ${portA.connectedTo.label}` }
+  }
+  
+  if (portB.connectedTo) {
+    return { isValid: false, reason: `${portB.label} port is already connected to ${portB.connectedTo.label}` }
+  }
+
   if (portA.direction === portB.direction) {
     return { isValid: false, reason: 'port directions are the same' }
   }

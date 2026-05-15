@@ -6,7 +6,7 @@ export class Port {
       this.portType = portType;
       this.signal = signal;
       this.direction = direction;
-      this.connectedTo = null;
+      this.connectedToPortId = null;
       this.device = null;
     }
     

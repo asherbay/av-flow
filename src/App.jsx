@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
+import {connectPorts} from './connectPorts.js'
+import {createDeviceFromDefinition} from './createDeviceFromDefinition.js'
+
+import {deviceCatalog} from './deviceCatalog.js'
 
 function App() {
   const [devices, setDevices] = useState([])
-  const [connectMode, setConnectMode] = useState(false)
-  const [selectedSourcePort, setSelectedSourcePort] = useState(null)
-  const [selectedTargetPort, setSelectedTargetPort] = useState(null)
+  const [selectedPort, setSelectedPort] = useState(null)
+  // const [secondSelectedPort, setSecondSelectedPort] = useState(null)
   
   useEffect(() => {
     setDevices([
-      new Device(laptopDefinition.type, laptopDefinition.label, laptopDefinition.ports),
-      new Device(projectorDefinition.type, projectorDefinition.label, projectorDefinition.ports)
+      createDeviceFromDefinition(deviceCatalog.find((d)=>d.deviceType === "Laptop")),
+      createDeviceFromDefinition(deviceCatalog.find((d)=>d.deviceType === "Projector"))
     ]);
   }, [])
 
@@ -22,76 +22,32 @@ function App() {
   }, [devices.length])
 
 
-   useEffect(() => {
-    if(selectedSourcePort && selectedTargetPort) {
-      selectedSourcePort.connect(selectedTargetPort);
-      setDevices([...devices]) // Trigger re-render to show updated connections
-      setSelectedSourcePort(null)
-      setSelectedTargetPort(null)
-      setConnectMode(false)
+ 
+
+
+  function handlePortClick(port){
+
+    if(!selectedPort){
+      setSelectedPort(port)
+      return
     }
-  }, [selectedSourcePort, selectedTargetPort])
 
-  const portTypes = ['HDMI', 'USB', 'XLR', '1/8" TRS']
+    if(selectedPort && selectedPort.id === port.id) { //user selects the same port twice
+      setSelectedPort(null)
+      return
+    }
 
-  // class Port {
-  //   constructor(key, label, type, signal, direction, quantity) { //ie. "HDMI", "input"
-  //     this.id = crypto.randomUUID();
-  //     this.key = key;
-  //     this.label = label;
-  //     this.type = type;
-  //     this.signal = signal;
-  //     this.direction = direction;
-  //     this.quantity = quantity;
-  //     this.connectedTo = null;
-  //     this.device = null;
-  //   }
-  //   connect(targetPort) {
-  //     if(this.direction != targetPort.direction) { // Ensure one is input and the other is output
-  //       if(this.type === targetPort.type) { // Ensure port types match
-  //         this.connectedTo = targetPort;
-  //         targetPort.connectedTo = this;
-  //         console.log(`Connecting ${this.type} port to ${targetPort.type} port`);
-  //       } else {
-  //         console.error(`Cannot connect ${this.type} port to ${targetPort.type} port: incompatible types`);
-  //       }
-  //     } else {
-  //       console.error(`Cannot connect ${this.direction} port to another ${targetPort.direction} port`);
-  //     }
-  //   }
-  // }
+    const result = connectPorts(selectedPort, port)
 
-  // class Device {
-  //   constructor(type, label, ports = []) {
-  //     this.id = crypto.randomUUID();
-  //     this.type = type;
-  //     this.label = label;
-  //     this.ports = ports;
-  //     this.ports.forEach((port) => {
-  //       port.device = this
-  //     })
-  //   }
-  // } 
+    if(result.isValid){
+      setDevices((devices)=> [...devices])
+      console.log(`connected ${selectedPort.label} to ${port.label}`)
+    } else {
+      console.error(result.reason)
+    }
 
-  // const laptopDefinition = {
-  //   type: 'Laptop',
-  //   label: 'Laptop',
-  //   ports: [
-  //     new Port('hdmi-out', 'HDMI Out', 'HDMI', 'video', 'output', 1),
-  //     new Port('headphone-out', 'Headphone Out', '1/8" TRS', 'audio', 'output', 1),
-  //   ]
-  // }
-
-  // const projectorDefinition = {
-  //   type: 'Projector',
-  //   label: 'Projector',
-  //   ports: [
-  //     new Port('hdmi-in', 'HDMI In', 'HDMI', 'video', 'input', 1),
-  //   ]
-  // }
-
-
-
+    setSelectedPort(null)
+  }
 
 
   return (
@@ -104,24 +60,11 @@ function App() {
               <ul>
                 {device.ports.map((port) => (
                   <li key={port.id}>
-                    {port.label} ({port.type}, {port.direction})
+                    {port.label} ({port.portType}, {port.direction})
                     <button onClick={() => {
-                      if(connectMode) {
-                        if(selectedSourcePort && selectedSourcePort.id === port.id) {
-                          setSelectedSourcePort(null)
-                        } else if(selectedTargetPort && selectedTargetPort.id === port.id) {
-                          setSelectedTargetPort(null)
-                        } else if(!selectedSourcePort) {
-                          setSelectedSourcePort(port)
-                        } else if(!selectedTargetPort) {
-                          setSelectedTargetPort(port)
-                        }
-                      } else {
-                        setConnectMode(true)
-                        setSelectedSourcePort(port)
-                      }
-                    }} style={{ marginLeft: '10px', backgroundColor: (selectedSourcePort && selectedSourcePort.id === port.id) || (selectedTargetPort && selectedTargetPort.id === port.id) ? 'lightblue' : 'white' }}>
-                      {connectMode ? 'Select' : 'Connect'}
+                      handlePortClick(port)
+                    }} style={{ marginLeft: '10px', backgroundColor: (selectedPort && selectedPort.id === port.id) ? 'lightblue' : 'white' }}>
+                      {selectedPort ? 'Connect' : 'Select'}
                     </button>
                     {port.connectedTo && (
                       <span> - Connected to {port.connectedTo.device.label}'s {port.connectedTo.label}</span>
