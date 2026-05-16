@@ -3,30 +3,34 @@ import {findPortRecord} from './findPortRecord.js'
 
 export function connectPorts(devices, portAId, portBId) {
 
-    let portA = findPortRecord(devices, portAId)
-    let portB = findPortRecord(devices, portBId)
+    let portA = findPortRecord(devices, portAId)?.port
+    let portB = findPortRecord(devices, portBId)?.port
 
-    let connectAttempt = canConnect(portA, portB)
+    if(!portA || !portB){
+        return {isValid: false, reason: "One or both ports could not be found"}
+    }
+
+    let connectAttempt = canConnect(devices, portA, portB)
     if(connectAttempt.isValid){
         let updatedDevices = devices.map((d)=>{
             let updatedPorts = d.ports.map((p)=>{
                 
                 if(p.id === portAId){
-                    p.connectedToPortId = portBId
+                    return {...p, connectedToPortId: portBId}
                 }
                 if(p.id === portBId){
-                    p.connectedToPortId = portAId
+                    return {...p, connectedToPortId: portAId}
                 }
-                return {}
+                return p
             })
-            return {id: d.id, deviceType: d.deviceType, label: d.label, ports: updatedPorts}
+            return {...d, ports: updatedPorts}
         })
         
 
         // portAId.connectedTo = portBId
         // portBId.connectedTo = portAId
         // console.log(`Connecting ${sourcePort} to ${targetPort}`)
-        return { isValid: connectAttempt.isValid, reason: connectAttempt.reason, devices: updatedDevices}
+        return {...connectAttempt, devices: updatedDevices}
     } else {
         // console.error(`Cannot connect ${sourcePort} to ${targetPort}. Reason: ${connectAttempt.reason}`)
         return connectAttempt

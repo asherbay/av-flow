@@ -1,11 +1,22 @@
-export function canConnect(portA, portB) {
+import {findPortRecord} from './findPortRecord.js'
+export function canConnect(devices, portA, portB) {
+    
 
-  if (portA.connectedTo) {
-    return { isValid: false, reason: `${portA.label} port is already connected to ${portA.connectedTo.label}` }
+  if (portA.connectedToPortId) {
+    let portAConnectedPortRecord = findPortRecord(devices, portA.connectedToPortId)
+    if(!portAConnectedPortRecord){ //null guard
+        return {isValid: false, reason: `Port connected to ${portA.label} cannot be found`}
+    }
+    return { isValid: false, reason: `${portA.label} port is already connected to ${portAConnectedPortRecord.port.label}` }
   }
   
-  if (portB.connectedTo) {
-    return { isValid: false, reason: `${portB.label} port is already connected to ${portB.connectedTo.label}` }
+  if (portB.connectedToPortId) {
+    let portBConnectedPortRecord = findPortRecord(devices, portB.connectedToPortId)
+    if(!portBConnectedPortRecord){ //null guard
+        return {isValid: false, reason: `Port connected to ${portB.label} cannot be found`}
+    }
+
+    return { isValid: false, reason: `${portB.label} port is already connected to ${portBConnectedPortRecord.port.label}` }
   }
 
   if (portA.direction === portB.direction) {
