@@ -45,7 +45,7 @@
         ports: [
             {
                 key: 'main-out-l', 
-                label: 'Main Out L:', 
+                label: 'Main Out L', 
                 portType: 'XLR', 
                 signal: 'audio', 
                 direction: 'output',
@@ -53,7 +53,7 @@
             },
             {
                 key: 'main-out-r', 
-                label: 'Main Out R:', 
+                label: 'Main Out R', 
                 portType: 'XLR', 
                 signal: 'audio', 
                 direction: 'output',
@@ -61,7 +61,7 @@
             },
             {
                 key: 'ch-1-in', 
-                label: 'Channel 1 In:', 
+                label: 'Channel 1 In', 
                 portType: 'XLR', 
                 signal: 'audio', 
                 direction: 'input',
@@ -69,7 +69,7 @@
             },
             {
                 key: 'ch-2-in', 
-                label: 'Channel 2 In:', 
+                label: 'Channel 2 In', 
                 portType: 'XLR', 
                 signal: 'audio', 
                 direction: 'input',
@@ -77,7 +77,7 @@
             },
             {
                 key: 'ch-3-in', 
-                label: 'Channel 3 In:', 
+                label: 'Channel 3 In', 
                 portType: 'XLR', 
                 signal: 'audio', 
                 direction: 'input',
@@ -85,7 +85,7 @@
             },
             {
                 key: 'ch-4-in', 
-                label: 'Channel 4 In:', 
+                label: 'Channel 4 In', 
                 portType: 'XLR', 
                 signal: 'audio', 
                 direction: 'input',

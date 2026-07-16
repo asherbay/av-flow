@@ -6,6 +6,7 @@ import {findPortRecord} from './findPortRecord.js'
 import {deviceCatalog} from './deviceCatalog.js'
 import {disconnectPort} from './disconnectPort.js'
 import {traceSignalFlow} from './traceSignalFlow.js'
+import FlowCanvas from './FlowCanvas.jsx'
 
 function App() {
   const [devices, setDevices] = useState([])
@@ -27,10 +28,18 @@ function App() {
   }
 
 
+
+
   function handleTraceSignalFlowClick(){
     const result = traceSignalFlow(devices)
     const returnedPathsString = result.pathResults.map((pathResult) => 
-            pathResult.path.map((port)=> port.label).join(" -> ")
+            pathResult.path.map((port)=> {
+              const portDeviceRecord = findPortRecord(devices, port.id)
+              const portDevice = portDeviceRecord? portDeviceRecord.device : null
+        
+              return `${port.label}` + (portDevice? ` (${portDevice.label})` : '')
+            }
+            ).join(" -> ")
         ).join(", ")
 
     const reachedTerminalLabels = result.reachedTerminalIds.map((rtid)=>findPortRecord(devices, rtid).port.label)
@@ -42,7 +51,7 @@ function App() {
   }
 
   function handleDisconnectPortClick(port){
-
+    console.log("handleDisconnectPortClick called")
     
     const result = disconnectPort(devices, port.id)
 
@@ -97,10 +106,65 @@ function App() {
     setSelectedPort(null)
   }
 
+  function handleFlowConnect(connection){
+    const sourcePortId = connection.sourceHandle
+    const targetPortId = connection.targetHandle
+
+    if(!sourcePortId || !targetPortId){
+      return
+    }
+
+    const result = connectPorts(devices, sourcePortId, targetPortId)
+
+    if(result.isValid){
+
+      const sourcePortRecord = findPortRecord(devices, sourcePortId)
+      const targetPortRecord = findPortRecord(devices, targetPortId)
+      setDevices(result.devices)
+
+      setUserNotification(`connected ${sourcePortRecord ? sourcePortRecord.port.label : "--port record not found--"} to ${targetPortRecord ? targetPortRecord.port.label : "--port record not found--"}`)
+    } else {
+      setUserNotification(result.reason)
+      console.error(result.reason)
+    }
+
+
+  }
+
+  function handleNodeDragStop(event, node) {
+
+    console.log("drag stop")
+    const { x, y } = node.position
+
+    const device = devices.find((d)=>d.id===node.id)
+
+    const updatedDevices = devices.map((d)=>{
+
+      if(d.id===device.id){
+        return {...d, position: {x, y}}
+      }
+
+      return {...d}
+
+    })
+
+    setDevices(updatedDevices)
+
+  }
+
+
+  // function handleFlowDisconnect(connection){
+  //   const portRecord = findPortRecord(devices, connection)
+
+  // }
+
 
   return (
     <>
+
       <div className="App">
+        
+
           <h1>Device Connection Simulator</h1>
           <div>
             <h2>Add Devices:</h2>
@@ -112,33 +176,7 @@ function App() {
             )}
             </ul>
           </div>
-          {devices.map((device) => (
-            <div key={device.id} className="device">
-              <h2>{device.label}</h2>
-              <ul>
-                {device.ports.map((port) => {
-                  let connectedPortRecord = findPortRecord(devices, port.connectedToPortId)
-                  return (<li key={port.id}>
-                      {port.label} ({port.portType}, {port.direction})
-                      <button onClick={() => {
-                        handlePortClick(port)
-                      }} style={{ color: '#000000', marginLeft: '10px', backgroundColor: (selectedPort && selectedPort.id === port.id) ? 'lightblue' : 'white' }}>
-                        {selectedPort ? 'Connect' : 'Select'}
-                      </button>
-                      {port.connectedToPortId && (
-                        <button onClick={() => {handleDisconnectPortClick(port)}}> Disconnect </button>
-                      )}
-                      {port.connectedToPortId && (
-                        
-                        <span> - Connected to {connectedPortRecord?.device.label}'s {connectedPortRecord?.port.label}</span>
-                      )}
-                    </li>
-                    )
-                })
-                }
-              </ul>
-            </div>
-          ))}
+          
           <div >
             <button onClick={()=>{handleTraceSignalFlowClick()}}>Trace Signal Flow</button>
           </div>
@@ -146,6 +184,7 @@ function App() {
           <div style={{border: "0.5px solid white"}}>
             {userNotification ? userNotification : ""}
           </div>
+          <FlowCanvas devices={devices} handleNodeDragStop={handleNodeDragStop} handleFlowConnect={handleFlowConnect} handleFlowDisconnect={handleDisconnectPortClick}/>
       </div>
     </>
   )

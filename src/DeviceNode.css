@@ -1,0 +1,30 @@
+.device-node {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: left;
+  border: 1px solid white;
+  padding: 0px 15px 0px 15px;
+}
+
+.device-node h4 {
+  margin: 0;
+  text-align: left;
+  align-self: flex-start;
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.port-row span {
+    font-size: 10px;
+}
+
+.port-row {
+  position: relative;
+  width: 100%;
+  min-height: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0px 18px;
+  box-sizing: border-box;
+}

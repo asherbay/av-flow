@@ -24,6 +24,7 @@ export function createDeviceFromDefinition (definition, currentDevices) {
         deviceType: definition.deviceType, 
         label: definition.label + " " + numCurrentDevicesOfSameType, 
         ports: newPorts,
-        routing: definition.routing
+        routing: definition.routing,
+        position: {x: 20, y: 20}
     }
 }

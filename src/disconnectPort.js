@@ -10,6 +10,7 @@ export function disconnectPort(devices, portAId) {
     }
 
     if(!portA.connectedToPortId){
+        console.log("portA connected: ", portA.connectedToPortId)
         return {isValid: false, reason: "Port is not currently connected"}
     }
 
