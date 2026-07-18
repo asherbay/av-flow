@@ -7,11 +7,13 @@ import {deviceCatalog} from './deviceCatalog.js'
 import {disconnectPort} from './disconnectPort.js'
 import {traceSignalFlow} from './traceSignalFlow.js'
 import FlowCanvas from './FlowCanvas.jsx'
+import TraceReport from './TraceReport.jsx'
 
 function App() {
   const [devices, setDevices] = useState([])
   const [selectedPort, setSelectedPort] = useState(null)
   const [userNotification, setUserNotification] = useState("")
+  const [traceReport, setTraceReport] = useState(null)
   
   useEffect(() => {
  
@@ -45,9 +47,13 @@ function App() {
     const reachedTerminalLabels = result.reachedTerminalIds.map((rtid)=>findPortRecord(devices, rtid).port.label)
     const unreachableTerminalLabels = result.unreachableTerminalIds.map((utid)=>findPortRecord(devices, utid).port.label)
 
+    setTraceReport(result)
+    // setUserNotification(`paths: ${returnedPathsString}, reachable terminal IDs: ${reachedTerminalLabels.join(', ')} unreachable terminal IDs: ${unreachableTerminalLabels.join(', ')}`)
 
-    setUserNotification(`paths: ${returnedPathsString}, reachable terminal IDs: ${reachedTerminalLabels.join(', ')} unreachable terminal IDs: ${unreachableTerminalLabels.join(', ')}`)
+  }
 
+  function closeTraceReport(){
+    setTraceReport(null)
   }
 
   function handleDisconnectPortClick(port){
@@ -77,6 +83,14 @@ function App() {
       }
       
     
+  }
+
+  function handleDeleteDevice(device){
+    const updatedDevices = [...devices.filter((d)=>d.id!==device.id)]
+    setDevices(updatedDevices)
+    setUserNotification(`deleted ${device.label}`)
+    console.log(`deleted ${device.label}`)
+
   }
 
   function handlePortClick(port){
@@ -184,10 +198,13 @@ function App() {
           <div style={{border: "0.5px solid white"}}>
             {userNotification ? userNotification : ""}
           </div>
-          <FlowCanvas devices={devices} handleNodeDragStop={handleNodeDragStop} handleFlowConnect={handleFlowConnect} handleFlowDisconnect={handleDisconnectPortClick}/>
+          {traceReport && <TraceReport closeTraceReport={closeTraceReport} result={traceReport} devices={devices}/> }
+          <FlowCanvas devices={devices} handleNodeDragStop={handleNodeDragStop} handleFlowConnect={handleFlowConnect} handleFlowDisconnect={handleDisconnectPortClick} handleDeleteDevice={handleDeleteDevice}/>
       </div>
     </>
   )
 }
 
 export default App
+
+

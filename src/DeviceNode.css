@@ -24,7 +24,26 @@
   width: 100%;
   min-height: 10px;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
+
   padding: 0px 18px;
   box-sizing: border-box;
 }
+
+.port-row.output{
+      justify-content: flex-end;
+}
+
+.delete-button {
+    float: right;
+    margin: 0px;
+    scale: 80%;
+} 
+
+.top-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+

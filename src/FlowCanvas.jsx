@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge } from '@xyflow/react';
 import {findPortRecord} from './findPortRecord.js'
+import {canConnect} from './canConnect.js'
 import '@xyflow/react/dist/style.css';
 import DeviceNode from './DeviceNode.jsx'
  
@@ -13,7 +14,7 @@ export default function FlowCanvas(props) {
 
     const initialNodes = props.devices.map((d, index)=>   
         {
-            return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, handleFlowDisconnect: props.handleFlowDisconnect}, type: 'deviceNode'} 
+            return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
         }
     )
     const [nodes, setNodes] = useState(initialNodes)
@@ -23,12 +24,12 @@ export default function FlowCanvas(props) {
         const updatedNodes = props.devices.map((d)=>{
             const node = nodes.find((n)=>n.id===d.id)
             if(!node){
-                return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, handleFlowDisconnect: props.handleFlowDisconnect}, type: 'deviceNode'} 
+                return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
             }
             if(d.position.x !== node.position.x || d.position.y !== node.position.y){
-                return {...node, position: {x: device.position.x, y: device.position.y}, data: {device: d, handleFlowDisconnect: props.handleFlowDisconnect}}
+                return {...node, position: {x: device.position.x, y: device.position.y}, data: {device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
             }
-            return {...node, data: {device: d, handleFlowDisconnect: props.handleFlowDisconnect}}
+            return {...node, data: {device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
         })
         setNodes(updatedNodes)
     }, [props.devices])
@@ -87,6 +88,21 @@ export default function FlowCanvas(props) {
     const nodeTypes = {
         deviceNode: DeviceNode,
     }
+
+    function isValidConnection(connection){
+        const portARecord = findPortRecord(props.devices, connection.sourceHandle)
+        const portBRecord = findPortRecord(props.devices, connection.targetHandle)
+        if(!portARecord || !portBRecord){
+            return false
+        }
+        const portA = portARecord.port
+        const portB = portBRecord.port
+
+        const result = canConnect(props.devices, portA, portB)
+
+        return result.isValid
+
+    }
     
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -98,6 +114,7 @@ export default function FlowCanvas(props) {
             onNodeDragStop={props.handleNodeDragStop}
             onNodesChange={onNodesChange}
             nodeTypes={nodeTypes}
+            isValidConnection={isValidConnection}
             fitView
         />
         </div>

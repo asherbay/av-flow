@@ -1,4 +1,5 @@
 import {findPortRecord} from './findPortRecord.js'
+import {pathIdString} from './pathIdString.js'
 
 export function traceSignalFlow (devices) {
 
@@ -24,7 +25,7 @@ export function traceSignalFlow (devices) {
         function getNextConnectedPort(currentPort, currentPath, visitedPortIds){
 
             if(visitedPortIds.includes(currentPort.id)){
-                return [{origin: currentPath[0], status: 'failure', path: currentPath, terminal: null, reason: 'circular path'}]
+                return [{id: pathIdString(currentPath), origin: currentPath[0], status: 'failure', path: currentPath, terminal: null, reason: 'circular path'}]
             }
 
             if(currentPort.direction === 'output'){
@@ -37,12 +38,12 @@ export function traceSignalFlow (devices) {
                     return getNextConnectedPort(connectedPort, [...currentPath, connectedPort], [...visitedPortIds, currentPort.id])
                 } 
                 if(currentPort.connectedToPortId && !connectedPort) {
-                    return [{origin: currentPath[0], status: 'failure', path: currentPath, terminal: null, reason: `could not find connected port ${currentPort.connectedToPortId} from ${currentPort.label}`}]
+                    return [{id: pathIdString(currentPath), origin: currentPath[0], status: 'failure', path: currentPath, terminal: null, reason: `could not find connected port ${currentPort.connectedToPortId} from ${currentPort.label}`}]
                 }
             
             } else if(currentPort.direction === 'input'){
                 if(currentPort.flowRole === 'terminate'){
-                    return [{origin: currentPath[0], status: 'success', path: currentPath, terminal: currentPort, reason: ''}]
+                    return [{id: pathIdString(currentPath), origin: currentPath[0], status: 'success', path: currentPath, terminal: currentPort, reason: ''}]
                 }
 
                 const portDeviceRecord = findPortRecord(devices, currentPort.id)
@@ -76,7 +77,7 @@ export function traceSignalFlow (devices) {
                 }
                 
             }
-            return [{origin: currentPath[0], status: 'failure', path: currentPath, terminal: null, reason: 'broken path'}]
+            return [{id: pathIdString(currentPath), origin: currentPath[0], status: 'failure', path: currentPath, terminal: null, reason: 'broken path'}]
         }
 
         if(originPort.flowRole !== 'origin'){
