@@ -14,6 +14,9 @@ function App() {
   const [selectedPort, setSelectedPort] = useState(null)
   const [userNotification, setUserNotification] = useState("")
   const [traceReport, setTraceReport] = useState(null)
+
+  const [selectedPath, setSelectedPath] = useState("")
+  const [hoveredTraceItem, setHoveredTraceItem] = useState(null)
   
   useEffect(() => {
  
@@ -28,6 +31,7 @@ function App() {
     const newDevice = createDeviceFromDefinition(deviceCatalog.find((d)=>d.deviceType === type), devices)
     setDevices((devices)=> [...devices, newDevice])
   }
+
 
 
 
@@ -54,6 +58,7 @@ function App() {
 
   function closeTraceReport(){
     setTraceReport(null)
+    setSelectedPath("")
   }
 
   function handleDisconnectPortClick(port){
@@ -86,11 +91,37 @@ function App() {
   }
 
   function handleDeleteDevice(device){
-    const updatedDevices = [...devices.filter((d)=>d.id!==device.id)]
-    setDevices(updatedDevices)
+      closeTraceReport()
+      setSelectedPath("")
+
+      setDevices((currentDevices)=>{
+        const deviceToDelete = currentDevices.find((d)=>d.id===device.id)
+
+        if(!deviceToDelete){
+          return currentDevices
+        }
+
+        let updatedDevices = currentDevices
+
+        for(const port of deviceToDelete.ports){
+          const currentPortRecord = findPortRecord(updatedDevices, port.id)
+          const currentPort = currentPortRecord?.port
+
+          if(!currentPort?.connectedToPortId){
+            continue
+          }
+          
+          const result = disconnectPort(updatedDevices, port.id)
+
+          if(result.isValid){
+            updatedDevices = result.devices
+          }
+
+        }
+        return updatedDevices.filter((d)=>d.id!==device.id)
+      })
     setUserNotification(`deleted ${device.label}`)
     console.log(`deleted ${device.label}`)
-
   }
 
   function handlePortClick(port){
@@ -198,8 +229,8 @@ function App() {
           <div style={{border: "0.5px solid white"}}>
             {userNotification ? userNotification : ""}
           </div>
-          {traceReport && <TraceReport closeTraceReport={closeTraceReport} result={traceReport} devices={devices}/> }
-          <FlowCanvas devices={devices} handleNodeDragStop={handleNodeDragStop} handleFlowConnect={handleFlowConnect} handleFlowDisconnect={handleDisconnectPortClick} handleDeleteDevice={handleDeleteDevice}/>
+          {traceReport && <TraceReport closeTraceReport={closeTraceReport} result={traceReport} devices={devices} selectedPath={selectedPath} setSelectedPath={setSelectedPath} hoveredTraceItem={hoveredTraceItem} setHoveredTraceItem={setHoveredTraceItem}/> }
+          <FlowCanvas devices={devices} handleNodeDragStop={handleNodeDragStop} handleFlowConnect={handleFlowConnect} handleFlowDisconnect={handleDisconnectPortClick} handleDeleteDevice={handleDeleteDevice} selectedPath={selectedPath} setSelectedPath={setSelectedPath} traceReport={traceReport} hoveredTraceItem={hoveredTraceItem} setHoveredTraceItem={setHoveredTraceItem}/>
       </div>
     </>
   )

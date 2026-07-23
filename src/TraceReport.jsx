@@ -4,14 +4,17 @@ import {useState} from 'react'
 export default function TraceReport(props){
     const result = props.result
     const devices = props.devices
+    const hoveredTraceItem = props.hoveredTraceItem
+    const setHoveredTraceItem = props.setHoveredTraceItem
 
-    const [expandedRow, setExpandedRow] = useState("")
+    // console.log("hoveredTraceItem", hoveredTraceItem)
+    // const [expandedRow, setExpandedRow] = useState("")
 
     function toggleExpandRow(pathResultId){
-        if(expandedRow===pathResultId){
-            setExpandedRow("")
+        if(props.selectedPath===pathResultId){
+            props.setSelectedPath("")
         } else {
-            setExpandedRow(pathResultId)
+            props.setSelectedPath(pathResultId)
         }
     }
 
@@ -23,8 +26,8 @@ export default function TraceReport(props){
             {result.pathResults.map((pr, index)=>
                 pr.status==="success" && 
                 <div key={pr.id}>
-                    <button className="expand-row-button" onClick={()=>{toggleExpandRow(pr.id)}}>{expandedRow===pr.id ? "▼" : "▶"}</button>
-                    <TracePathRow pathResult={pr} devices={devices} expanded={expandedRow===pr.id}/>
+                    <button className="expand-row-button" onClick={()=>{toggleExpandRow(pr.id)}}>{props.selectedPath===pr.id ? "▼" : "▶"}</button>
+                    <TracePathRow pathResult={pr} devices={devices} expanded={props.selectedPath===pr.id} selectedPath={props.selectedPath} hoveredTraceItem={hoveredTraceItem} setHoveredTraceItem={setHoveredTraceItem}/>
                 </div>
             )}
         </div>

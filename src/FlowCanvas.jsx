@@ -14,25 +14,63 @@ export default function FlowCanvas(props) {
 
     const initialNodes = props.devices.map((d, index)=>   
         {
-            return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
+            return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, selectionData: {isSelected: false, selectedPortIdsOnDevice: [], status: null, isHovered: false, hoveredPortIdOnDevice: ""}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
         }
     )
     const [nodes, setNodes] = useState(initialNodes)
-    // const [nodeDragPositions, setNodeDragPositions] = useState({})
+
+
+    const selectedPathResult = props.traceReport?.pathResults.find((pr)=>pr.id===props.selectedPath)
+    const selectedPortIds = selectedPathResult?.path.map((port)=>port.id)
+    const selectedPortRecords = selectedPortIds?.map((pid)=>findPortRecord(props.devices, pid)).filter((pr)=>pr)
+    const selectedDeviceIds = [...new Set(selectedPortRecords?.map((pr)=>pr.device.id))]
+
+    
+
+    const selectedEdgeIds = new Set()
+
+    if(selectedPathResult){
+        for(let i = 0; i < selectedPathResult.path.length - 1; i++){
+            const portA = selectedPathResult.path[i]
+            const portB = selectedPathResult.path[i + 1]
+
+            const isCableConnection = 
+                portA.connectedToPortId === portB.id || portB.connectedToPortId === portA.id
+            
+            if(!isCableConnection){
+                continue
+            }
+
+            const outputPortId = portA.direction === "output" ? portA.id : portB.id
+            const inputPortId = portA.direction === "input" ? portA.id : portB.id
+            selectedEdgeIds.add(`${outputPortId}-${inputPortId}`)
+        }
+    }
+
 
     useEffect(()=>{
+        console.log("props.hoveredTraceItem", props.hoveredTraceItem)
         const updatedNodes = props.devices.map((d)=>{
             const node = nodes.find((n)=>n.id===d.id)
+            const isSelected = selectedDeviceIds.includes(d.id)
+            const selectedPortsOnDevice = selectedPathResult ? d.ports.filter((port)=>selectedPortIds.includes(port.id)) : []
+            const selectedPortIdsOnDevice = selectedPortsOnDevice?.map((port)=>port.id)
+            const status = selectedPathResult ? selectedPathResult.status : null
+            const isHovered = props.hoveredTraceItem?.id === d.id
+            const hoveredPortOnDevice = props.hoveredTraceItem && props.hoveredTraceItem.type==="port" ? d.ports.find((port)=>port.id===props.hoveredTraceItem.id) : null
+            const hoveredPortIdOnDevice = hoveredPortOnDevice ? hoveredPortOnDevice.id : null
+            
+
             if(!node){
-                return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
+                return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
             }
             if(d.position.x !== node.position.x || d.position.y !== node.position.y){
-                return {...node, position: {x: device.position.x, y: device.position.y}, data: {device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
+                return {...node, position: {x: d.position.x, y: d.position.y}, data: {device: d, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
             }
-            return {...node, data: {device: d, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
+            return {...node, data: {device: d, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
         })
         setNodes(updatedNodes)
-    }, [props.devices])
+    }, [props.devices, props.selectedPath, props.hoveredTraceItem])
 
 
 
@@ -75,8 +113,24 @@ export default function FlowCanvas(props) {
         const inDeviceId = inPortRecord.device.id
         const outDeviceId = outPortRecord.device.id
 
+        const edgeId = `${outPortId}-${inPortId}`
+        const isSelected = selectedEdgeIds.has(edgeId)
+        const selectedStatus = selectedPathResult?.status
         
-        return [{ id: `${outDeviceId}-${inDeviceId}`, source: outDeviceId, target: inDeviceId, sourceHandle: outPortId, targetHandle: inPortId }]
+        return [{ 
+            id: edgeId, 
+            source: outDeviceId, 
+            target: inDeviceId, 
+            sourceHandle: outPortId, 
+            targetHandle: inPortId,
+            style: isSelected ? {
+                stroke: selectedStatus === "success" ? "#008000" : "#FF0000",
+                strokeWidth: 2.5
+            } : {
+                stroke: "white",
+                strokeWidth: 1.5
+            }
+        }]
     })
     
 
@@ -109,12 +163,11 @@ export default function FlowCanvas(props) {
         <ReactFlow
             nodes={nodes}
             edges={edges}
-            // onEdgesChange={onEdgesChange}
             onConnect={props.handleFlowConnect}
             onNodeDragStop={props.handleNodeDragStop}
             onNodesChange={onNodesChange}
             nodeTypes={nodeTypes}
-            isValidConnection={isValidConnection}
+            // isValidConnection={isValidConnection}
             fitView
         />
         </div>

@@ -4,8 +4,24 @@
   justify-content: flex-start;
   align-items: flex-start;
   text-align: left;
-  border: 1px solid white;
   padding: 0px 15px 0px 15px;
+}
+
+.device-node.not-selected {
+  border: 1px solid white;
+  
+
+}
+
+.device-node.selected.success {
+  border: 1px solid green;
+}
+.device-node.selected.failure {
+  border: 1px solid red;
+}
+
+.device-node.hovered{
+    background-color: rgb(255 255 255 / 5%);
 }
 
 .device-node h4 {
@@ -14,6 +30,19 @@
   align-self: flex-start;
   background: rgba(255, 0, 0, 0.2);
 }
+
+.port-handle.selected.success{
+    border:  2.5px solid #008000;
+}
+
+.port-handle.selected.failure{
+    border:  2.5px solid #FF0000;
+}
+
+.port-handle.hovered{
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 25%);
+}
+
 
 .port-row span {
     font-size: 10px;
