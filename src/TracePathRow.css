@@ -1,0 +1,212 @@
+.trace-path-card {
+  --path-color: var(--success);
+
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #101a20;
+}
+
+.trace-path-card.failure {
+  --path-color: var(--danger);
+}
+
+.trace-path-card.expanded {
+  border-color: var(--path-color);
+}
+
+.trace-path-toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 12px 10px;
+  width: 100%;
+  padding: 15px 14px;
+  border: 0;
+  border-radius: 7px;
+  text-align: left;
+  background: transparent;
+}
+
+.trace-path-toggle:hover {
+  background: #ffffff04;
+}
+
+.trace-path-endpoints {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.trace-path-endpoint,
+.trace-path-destination {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.trace-path-arrow {
+  margin-inline: 3px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.trace-path-chevron {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--text-muted);
+}
+
+.trace-path-card.expanded .trace-path-chevron {
+  transform: rotate(180deg);
+}
+
+.trace-path-meta {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.trace-signal-type {
+  padding: 2px 7px;
+  border: 1px solid #ffffff0d;
+  border-radius: 4px;
+  color: var(--text-muted);
+  background: #ffffff04;
+}
+
+.trace-path-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--path-color);
+}
+
+.trace-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.trace-path-details {
+  padding: 14px 14px 16px;
+  border-top: 1px solid #ffffff0a;
+  animation: trace-route-reveal 140ms ease-out;
+}
+
+.trace-route-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.trace-route-heading > span:first-child {
+  text-transform: uppercase;
+}
+
+.trace-route {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trace-route-stop {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  padding-bottom: 20px;
+}
+
+.trace-route-stop:last-child {
+  padding-bottom: 0;
+}
+
+.trace-route-stop:not(:last-child)::before {
+  position: absolute;
+  top: 22px;
+  bottom: 2px;
+  left: 9.5px;
+  width: 1px;
+  background: var(--border);
+  content: '';
+}
+
+.trace-stop-marker {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--path-color);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface);
+}
+
+.trace-stop-ports {
+  display: grid;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.trace-stop-port {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.trace-port-direction {
+  flex-shrink: 0;
+  width: 24px;
+  color: var(--text-muted);
+  font-size: 8px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.trace-unavailable-device {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.trace-path-issue {
+  margin-top: 16px;
+  padding: 10px;
+  border-radius: 4px;
+  color: var(--danger);
+  font-size: 11px;
+  line-height: 1.6;
+  background: #f58c870d;
+}
+
+@keyframes trace-route-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-path-details {
+    animation: none;
+  }
+}

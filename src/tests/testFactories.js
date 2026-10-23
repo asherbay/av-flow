@@ -28,7 +28,7 @@ export function makeDevices(...portsByDevice){
     })
 }
 
-export function makeDevice({ports, routing, ...overrides}){
+export function makeDevice({ports, routing={}, ...overrides}){
     deviceCount += 1
     return {
         id: `device-${deviceCount}`,

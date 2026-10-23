@@ -44,6 +44,32 @@ describe("traceSignalFlow", ()=>{
 
     })
 
+    test("returns successful paths to both speakers when the first routes signal through to the second", ()=>{
+        const originPort = makePort({id: "origin-port", direction: "output", flowRole: "origin", signal: "audio", portType: "XLR", connectedToPortId: "speaker-a-in"})
+        const speakerAIn = makePort({id: "speaker-a-in", key: "audio-in", direction: "input", flowRole: "terminate", signal: "audio", portType: "XLR", connectedToPortId: "origin-port"})
+        const speakerAThru = makePort({id: "speaker-a-thru", key: "audio-thru", direction: "output", flowRole: "pass-through", signal: "audio", portType: "XLR", connectedToPortId: "speaker-b-in"})
+        const speakerBIn = makePort({id: "speaker-b-in", key: "audio-in", direction: "input", flowRole: "terminate", signal: "audio", portType: "XLR", connectedToPortId: "speaker-a-thru"})
+
+        const originDevice = makeDevice({ports: [originPort]})
+        const speakerA = makeDevice({ports: [speakerAIn, speakerAThru], routing: {"audio-in": ["audio-thru"]}})
+        const speakerB = makeDevice({ports: [speakerBIn]})
+
+        const result = traceSignalFlow([originDevice, speakerA, speakerB])
+
+        expect(result.pathResults).toHaveLength(2)
+        expect(result.pathResults.map((pr)=>({
+            status: pr.status,
+            terminalId: pr.terminal?.id,
+            pathIds: pr.path.map((port)=>port.id)
+        }))).toEqual(expect.arrayContaining([
+            {status: "success", terminalId: "speaker-a-in", pathIds: ["origin-port", "speaker-a-in"]},
+            {status: "success", terminalId: "speaker-b-in", pathIds: ["origin-port", "speaker-a-in", "speaker-a-thru", "speaker-b-in"]}
+        ]))
+        expect(result.reachedTerminalIds).toHaveLength(2)
+        expect(result.reachedTerminalIds).toEqual(expect.arrayContaining(["speaker-a-in", "speaker-b-in"]))
+        expect(result.unreachableTerminalIds).toEqual([])
+    })
+
     test("returns a failed path result when no terminal port is reached", ()=>{
         const portA = makePort({direction: "output", id: "port-a", flowRole: "origin", connectedToPortId: "port-b"})
         const portB = makePort({direction: "input", id: "port-b", flowRole: "pass-through", connectedToPortId: "port-a"})

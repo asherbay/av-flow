@@ -1,7 +1,26 @@
-.trace-path-item.not-hovered{
-    background-color: rgb(255 255 255 / 1%);
+.trace-path-item {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: anywhere;
+  background: transparent;
 }
 
-.trace-path-item.hovered{
-    background-color: rgb(255 255 255 / 10%);
+.trace-path-item.device {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.trace-path-item:hover,
+.trace-path-item.hovered,
+.trace-path-item:focus-visible {
+  color: var(--text);
+  background: #ffffff12;
 }

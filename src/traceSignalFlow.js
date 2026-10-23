@@ -42,22 +42,21 @@ export function traceSignalFlow (devices) {
                 }
             
             } else if(currentPort.direction === 'input'){
+
+                let branchResults = []
                 if(currentPort.flowRole === 'terminate'){
-                    return [{id: pathIdString(currentPath), origin: currentPath[0], status: 'success', path: currentPath, terminal: currentPort, reason: ''}]
+                    branchResults.push({id: pathIdString(currentPath), origin: currentPath[0], status: 'success', path: currentPath, terminal: currentPort, reason: ''})
                 }
 
                 const portDeviceRecord = findPortRecord(devices, currentPort.id)
                 const portDevice = portDeviceRecord? portDeviceRecord.device : null
 
                 if(portDevice){
-                    const destinationPortKeys = portDevice.routing[currentPort.key] ? portDevice.routing[currentPort.key] : null
+                    const destinationPortKeys = portDevice.routing[currentPort.key] ?? []
                     const destinationPorts = destinationPortKeys ? destinationPortKeys.map((dpk)=>
                         portDevice.ports.find((p)=>p.key === dpk)
                     ) : null
-                    if(destinationPorts){
-                        
-                        let branchResults = []
-
+                    if(destinationPorts.length > 0){
                         destinationPorts.forEach((destinationPort) => {
                             const nextPath = [...currentPath, destinationPort]
                             const nextVisited = [...visitedPortIds, currentPort.id]
@@ -70,10 +69,12 @@ export function traceSignalFlow (devices) {
 
                             branchResults = [...branchResults, ...branchPathResults]
                         })
-
-                        return branchResults
                     }
                     
+                }
+
+                if(branchResults.length > 0){
+                    return branchResults
                 }
                 
             }

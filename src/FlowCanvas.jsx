@@ -14,7 +14,7 @@ export default function FlowCanvas(props) {
 
     const initialNodes = props.devices.map((d, index)=>   
         {
-            return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, selectionData: {isSelected: false, selectedPortIdsOnDevice: [], status: null, isHovered: false, hoveredPortIdOnDevice: ""}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
+            return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, devices: props.devices, selectionData: {isSelected: false, selectedPortIdsOnDevice: [], status: null, isHovered: false, hoveredPortIdOnDevice: ""}, updateDevices: props.updateDevices, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
         }
     )
     const [nodes, setNodes] = useState(initialNodes)
@@ -62,12 +62,12 @@ export default function FlowCanvas(props) {
             
 
             if(!node){
-                return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
+                return {id: d.id, position: {x: d.position.x, y: d.position.y}, data: { device: d, devices: props.devices, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, updateDevices: props.updateDevices, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}, type: 'deviceNode'} 
             }
             if(d.position.x !== node.position.x || d.position.y !== node.position.y){
-                return {...node, position: {x: d.position.x, y: d.position.y}, data: {device: d, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
+                return {...node, position: {x: d.position.x, y: d.position.y}, data: {device: d, devices: props.devices, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, updateDevices: props.updateDevices, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
             }
-            return {...node, data: {device: d, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
+            return {...node, data: {device: d, devices: props.devices, selectionData: {isSelected: isSelected, selectedPortIdsOnDevice: selectedPortIdsOnDevice, status: status, isHovered, hoveredPortIdOnDevice}, updateDevices: props.updateDevices, handleFlowDisconnect: props.handleFlowDisconnect, deleteDevice: props.handleDeleteDevice}}
         })
         setNodes(updatedNodes)
     }, [props.devices, props.selectedPath, props.hoveredTraceItem])
@@ -124,10 +124,10 @@ export default function FlowCanvas(props) {
             sourceHandle: outPortId, 
             targetHandle: inPortId,
             style: isSelected ? {
-                stroke: selectedStatus === "success" ? "#008000" : "#FF0000",
+                stroke: selectedStatus === "success" ? "var(--success)" : "var(--danger)",
                 strokeWidth: 2.5
             } : {
-                stroke: "white",
+                stroke: "#7f9baa",
                 strokeWidth: 1.5
             }
         }]
@@ -159,7 +159,7 @@ export default function FlowCanvas(props) {
     }
     
     return (
-        <div style={{ width: '100vw', height: '100vh' }}>
+        <div className="flow-canvas">
         <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -169,6 +169,7 @@ export default function FlowCanvas(props) {
             nodeTypes={nodeTypes}
             // isValidConnection={isValidConnection}
             fitView
+            fitViewOptions={{ maxZoom: 1, padding: 0.2 }}
         />
         </div>
     );

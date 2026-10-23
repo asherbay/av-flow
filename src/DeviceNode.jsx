@@ -1,54 +1,64 @@
-import {Position, Handle} from '@xyflow/react'
+import { Position, Handle } from '@xyflow/react'
+import SwitcherOutputSelector from './SwitcherOutputSelector.jsx'
 import './DeviceNode.css'
 
-export default function DeviceNode (props){
-    const device = props.data.device
-    const handleFlowDisconnect = props.data.handleFlowDisconnect
-    const deleteDevice = props.data.deleteDevice
-    const selectionData = props.data.selectionData
+export default function DeviceNode({ data }) {
+  const { device, devices, updateDevices, handleFlowDisconnect, deleteDevice, selectionData } = data
 
-
-    //make a selection object {isSelected: true, status: "success/failure", selectedPortIds: [], isHighlighted: true, highlightedPortIds: []}
-    return (
-        <div className={`device-node ${selectionData.isSelected ? "selected" : "not-selected"} ${selectionData.status ? selectionData.status : ""} ${selectionData.isHovered ? "hovered" : "not-hovered"}`}>
-            <div className="top-row">
-                <span> {device.label} </span>
-                <button className="delete-button" onClick={()=>deleteDevice(props.data.device)}>X</button>
-            </div>
-            {device.ports.map((p)=> {
-                const isSelectedPort = selectionData.selectedPortIdsOnDevice.includes(p.id)
-                const isHoveredPort = selectionData.hoveredPortIdOnDevice === p.id
-
-                if(p.direction === "input"){
-                    return (
-                        <div className={`port-row input`} key={p.key}>
-                            <Handle 
-                                id={p.id} 
-                                key={p.key} 
-                                type="target"
-                                position={Position.Left}
-                                onClick={()=>handleFlowDisconnect(p)}
-                                className={`port-handle ${isSelectedPort ? `selected ${selectionData.status}` :  "not-selected"} ${isHoveredPort ? "hovered" : "not-hovered"}`}
-                            />
-                            <span className={`port-label`}>{p.label}</span>
-                        </div>
-                    )
-                } else if(p.direction === "output"){
-                    return (
-                        <div className={`port-row output`} key={p.key}>
-                            <span>{p.label}</span>
-                            <Handle 
-                                id={p.id} 
-                                key={p.key} 
-                                type="source"
-                                position={Position.Right}
-                                onClick={()=>handleFlowDisconnect(p)}
-                                className={`port-handle ${isSelectedPort ? `selected ${selectionData.status}` :  "not-selected"} ${isHoveredPort ? "hovered" : "not-hovered"}`}
-                            />
-                        </div>
-                    )
-                }
-            })}
+  return (
+    <div className={`device-node ${selectionData.isSelected ? 'selected' : 'not-selected'} ${selectionData.status ?? ''} ${selectionData.isHovered ? 'hovered' : 'not-hovered'}`}>
+      <div className="device-node-header">
+        <span className="device-node-symbol" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="M7 9h10M7 13h4M15 13h2" />
+          </svg>
+        </span>
+        <div className="device-node-heading">
+          <h3 className="device-node-label">{device.label}</h3>
+          <span className="device-node-port-count">
+            {device.ports.length} {device.ports.length === 1 ? 'port' : 'ports'}
+          </span>
         </div>
-    )
+        <button
+          type="button"
+          className="device-node-delete nodrag nopan"
+          aria-label={`Delete ${device.label}`}
+          title={`Delete ${device.label}`}
+          onClick={() => deleteDevice(device)}
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <path d="m4 4 8 8M12 4l-8 8" />
+          </svg>
+        </button>
+      </div>
+      <div className="device-node-ports">
+        {device.ports.map((port) => {
+          const isInput = port.direction === 'input'
+          const isConnected = Boolean(port.connectedToPortId)
+          const isSelected = selectionData.selectedPortIdsOnDevice.includes(port.id)
+          const isHovered = selectionData.hoveredPortIdOnDevice === port.id
+
+          return (
+            <div className={`port-row ${port.direction}`} key={port.key}>
+              <span className="port-label">{port.label}</span>
+              <span className="port-type">{port.portType}</span>
+              {
+                (device.deviceType.includes("Video Switcher") && !isInput) && 
+                <SwitcherOutputSelector device={device} output={port} devices={devices} updateDevices={updateDevices}/>
+               }
+              <Handle
+                id={port.id}
+                type={isInput ? 'target' : 'source'}
+                position={isInput ? Position.Left : Position.Right}
+                title={`${port.label} (${port.portType}, ${port.direction})${isConnected ? ' - click to disconnect' : ' - drag to connect'}`}
+                onClick={() => handleFlowDisconnect(port)}
+                className={`port-handle ${isConnected ? 'connected' : 'unconnected'} ${isSelected ? `selected ${selectionData.status}` : 'not-selected'} ${isHovered ? 'hovered' : 'not-hovered'}`}
+              />
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }

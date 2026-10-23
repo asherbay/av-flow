@@ -1,0 +1,111 @@
+.trace-report {
+  font-size: 12px;
+}
+
+.trace-overview {
+  margin-bottom: 26px;
+  padding: 2px 4px 0;
+}
+
+.trace-overview-label {
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trace-overview p {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.trace-overview strong {
+  margin-right: 3px;
+  color: var(--success);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.trace-overview-caption {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.trace-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-inline: 4px;
+}
+
+.trace-section-heading h3 {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.trace-section-heading > span {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 10px;
+  text-align: center;
+  background: #ffffff08;
+}
+
+.trace-path-list {
+  display: grid;
+  gap: 10px;
+}
+
+.trace-no-paths {
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: 7px;
+}
+
+.trace-no-paths h4 {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.trace-no-paths p,
+.trace-section-description {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.trace-unreached {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.trace-section-description {
+  padding-inline: 4px;
+}
+
+.trace-unreached-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trace-unreached-list li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border-left: 2px solid var(--warning);
+  border-radius: 0 4px 4px 0;
+  background: #e1be7505;
+}

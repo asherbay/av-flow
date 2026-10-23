@@ -1,0 +1,32 @@
+.trace-report-panel {
+  border-left: 1px solid var(--border);
+  background: linear-gradient(180deg, #1b283055, transparent);
+}
+
+.clear-report-button {
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+  background: transparent;
+}
+
+.clear-report-button:hover {
+  color: var(--text);
+  background: var(--surface-raised);
+}
+
+.trace-empty-label {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.trace-report-panel .panel-body {
+  padding: 18px 14px;
+}

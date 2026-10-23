@@ -1,78 +1,173 @@
 .device-node {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  --node-outline: #3e5666;
+
+  width: 248px;
+  border: 1px solid var(--node-outline);
+  border-radius: 8px;
+  color: var(--text);
+  background: #18242d;
+  box-shadow: 0 5px 16px #00000033;
   text-align: left;
-  padding: 0px 15px 0px 15px;
 }
 
-.device-node.not-selected {
-  border: 1px solid white;
-  
-
+.react-flow__node.selected .device-node {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px #65d8cf22, 0 5px 16px #00000033;
 }
 
 .device-node.selected.success {
-  border: 1px solid green;
+  --node-outline: var(--success);
+
+  border-color: var(--node-outline);
 }
+
 .device-node.selected.failure {
-  border: 1px solid red;
+  --node-outline: var(--danger);
+
+  border-color: var(--node-outline);
 }
 
-.device-node.hovered{
-    background-color: rgb(255 255 255 / 5%);
+.device-node.hovered {
+  background: #253744;
+  box-shadow: 0 0 0 3px #ffffff1a, 0 5px 16px #00000033;
 }
 
-.device-node h4 {
-  margin: 0;
-  text-align: left;
-  align-self: flex-start;
-  background: rgba(255, 0, 0, 0.2);
+.device-node-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 12px 12px 14px;
+  border-bottom: 1px solid #ffffff0d;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(120deg, #ffffff05, transparent);
 }
 
-.port-handle.selected.success{
-    border:  2.5px solid #008000;
+.device-node-symbol {
+  display: grid;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid #516e7e55;
+  border-radius: 5px;
+  color: #a3bfce;
+  background: #ffffff03;
 }
 
-.port-handle.selected.failure{
-    border:  2.5px solid #FF0000;
+.device-node-symbol svg {
+  width: 20px;
+  height: 20px;
 }
 
-.port-handle.hovered{
-    box-shadow: 0 0 0 4px rgb(255 255 255 / 25%);
+.device-node-heading {
+  flex: 1;
+  min-width: 0;
 }
 
+.device-node-label {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
 
-.port-row span {
-    font-size: 10px;
+.device-node-port-count {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.device-node-delete {
+  display: grid;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.device-node-delete svg {
+  width: 14px;
+  height: 14px;
+}
+
+.device-node-delete:hover {
+  color: var(--danger);
+  background: #f58c871a;
+}
+
+.device-node-ports {
+  padding-block: 4px 8px;
 }
 
 .port-row {
   position: relative;
-  width: 100%;
-  min-height: 10px;
   display: flex;
-  /* align-items: center; */
-
-  padding: 0px 18px;
-  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 8px 16px;
 }
 
-.port-row.output{
-      justify-content: flex-end;
+.port-row.output {
+  flex-direction: row-reverse;
+  text-align: right;
 }
 
-.delete-button {
-    float: right;
-    margin: 0px;
-    scale: 80%;
-} 
-
-.top-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
+.port-row.output select {
+  background-color: var(--surface-raised);
 }
 
+.port-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.port-type {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 9px;
+  letter-spacing: 0.03em;
+}
+
+.device-node .port-handle {
+  width: 11px;
+  height: 11px;
+  border: 2px solid #7f9baa;
+  border-radius: 3px;
+  background: #18242d;
+}
+
+/* Enlarge the pointer target without changing the cable attachment point. */
+.device-node .port-handle::before {
+  position: absolute;
+  inset: -7px;
+  content: '';
+}
+
+.device-node .port-handle.connected {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.device-node .port-handle.selected.success {
+  border-color: var(--success);
+  background: var(--success);
+}
+
+.device-node .port-handle.selected.failure {
+  border-color: var(--danger);
+  background: var(--danger);
+}
+
+.device-node .port-handle:hover,
+.device-node .port-handle.hovered {
+  box-shadow: 0 0 0 4px #ffffff33;
+}
 
